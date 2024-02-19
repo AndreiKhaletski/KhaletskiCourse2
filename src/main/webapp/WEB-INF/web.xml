@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         metadata-complete="false"
+         version="6.0">
+
+
+<!--    Смотри аннотацию @WebServlet-->
+
+<!--    <servlet>-->
+<!--        <servlet-name>Servlet1</servlet-name>-->
+<!--        <servlet-class>by.id_academy.jd2.first.HelloWorldServlet</servlet-class>-->
+<!--        <load-on-startup>1</load-on-startup>-->
+<!--    </servlet>-->
+
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>Servlet1</servlet-name>-->
+<!--        <url-pattern>/andy</url-pattern>-->
+<!--    </servlet-mapping>-->
+</web-app>
