@@ -1,66 +1,76 @@
 package by.id_academy.jd2.first;
 
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.http.HttpRequest;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.System.out;
 import static java.util.stream.Collectors.toMap;
 
 @WebServlet(name = "Vote", urlPatterns = "/vote")
 public class Vote extends HttpServlet {
-    private final List<String> list = new ArrayList<>();
-    private final List<String> comments_list = new ArrayList<>();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        getServletContext().setAttribute("Serv", this);
+    }
+
+    private final List<String> listPerformer = new ArrayList<>();
+    private final List<String> listGenres = new ArrayList<>();
+    private final List<String> commentsList = new ArrayList<>();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
 
         PrintWriter writer = resp.getWriter();
+        Date date = new Date();
 
-        String answer = req.getParameter("answer");
-        list.add(answer);
+        String performer = req.getParameter("performerHtml");
+        String[] genres = req.getParameterValues("genresHtml");
+        String comment = req.getParameter("commentHtml");
 
-        Enumeration<String> enumes = req.getParameterNames();
-        while (enumes.hasMoreElements()) {
-            String vote = enumes.nextElement();
-            boolean checked = vote.startsWith("vote");
-            if (checked) {
-                list.add(req.getParameter(vote));
-            }
+        if (genres.length < 3 || genres.length > 5) {
+            writer.println("<h1>" + "Необходимо выбрать от 3 до 5 жанров" + "</h1>");
+            writer.close();
+        } else {
+            listGenres.addAll(Arrays.asList(genres));
         }
 
-        String comment = req.getParameter("comment");
-        Date date = new Date();
-        comments_list.add(comment + " (" + date + ")");
+        listPerformer.add(performer);
+
+        if (!Objects.equals(comment, "")) {
+            commentsList.add(comment + " (" + date + ")");
+        }
 
         writer.write("<p><i>Результаты голосования:</i></p>");
         writer.write("<p><b>Лучший исполнитель:</b><p>");
 
-        Map<String, Integer> list_map = list.stream().collect(toMap(e -> e, e -> 1, Integer::sum));
+        Map<String, Integer> listMapPerformer = listPerformer.stream().collect(toMap(e -> e, e -> 1, Integer::sum));
 
-//        list_map.forEach((k, v) -> out.println(k + " " + v));
-        List<Map.Entry<String, Integer>> collect = list_map.entrySet().stream()
+        List<Map.Entry<String, Integer>> collect = listMapPerformer.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .toList();
+
+        Map<String, Integer> listMapGenres = listGenres.stream().collect(toMap(e -> e, e -> 1, Integer::sum));
+
+        List<Map.Entry<String, Integer>> collect2 = listMapGenres.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .toList();
 
         for (Map.Entry<String, Integer> pair : collect) {
             String key = pair.getKey();
             Integer value = pair.getValue();
-//            writer.write("<p>" + key + " : " + value + "</p>");
 
             switch (key) {
                 case "a1" -> writer.write("<p>Linkin Park = " + value + " гол.</p>");
@@ -71,7 +81,7 @@ public class Vote extends HttpServlet {
         }
 
         writer.write("<p><b>Ваши любимые жанры:</b></p>");
-        for (Map.Entry<String, Integer> pair : collect) {
+        for (Map.Entry<String, Integer> pair : collect2) {
             String key = pair.getKey();
             Integer value = pair.getValue();
 
@@ -90,17 +100,8 @@ public class Vote extends HttpServlet {
         }
 
         writer.write("<p><b>Комментарии:</b><p>");
-        for (int i = 0; i < comments_list.size(); i++) {
-            writer.write("<p>" + comments_list.get(i) + "</p>");
+        for (int i = 0; i < commentsList.size(); i++) {
+            writer.write("<p>" + commentsList.get(i) + "</p>");
         }
     }
-
-//    @Override
-//    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        req.setCharacterEncoding("UTF-8");
-//        resp.setContentType("text/html; charset=UTF-8");
-//
-//        doGet(req, resp);
-////        service(req, resp);
-//    }
 }
