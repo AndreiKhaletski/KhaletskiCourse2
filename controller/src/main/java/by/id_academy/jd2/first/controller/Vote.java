@@ -1,7 +1,7 @@
-package by.id_academy.jd2.first;
+package by.id_academy.jd2.first.controller;
 
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
+import by.id_academy.jd2.first.service.VoteService;
+import by.id_academy.jd2.first.service.api.IVoteService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,23 +9,18 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toMap;
 
 @WebServlet(name = "Vote", urlPatterns = "/vote")
 public class Vote extends HttpServlet {
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        getServletContext().setAttribute("Serv", this);
-    }
 
-    private final List<String> listPerformer = new ArrayList<>();
-    private final List<String> listGenres = new ArrayList<>();
-    private final List<String> commentsList = new ArrayList<>();
+    private final static String ARTIST_PARAM_NAME = "performerHtml";
+    private final static String GENRE_PARAM_NAME = "genresHtml";
+    private final static String ABOUT_PARAM_NAME = "commentHtml";
+    IVoteService iVoteService = new VoteService();
+    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -34,41 +29,17 @@ public class Vote extends HttpServlet {
         resp.setContentType("text/html; charset=UTF-8");
 
         PrintWriter writer = resp.getWriter();
-        Date date = new Date();
 
-        String performer = req.getParameter("performerHtml");
-        String[] genres = req.getParameterValues("genresHtml");
-        String comment = req.getParameter("commentHtml");
+        String performer = req.getParameter(ARTIST_PARAM_NAME);
+        String[] genres = req.getParameterValues(GENRE_PARAM_NAME);
+        String comment = req.getParameter(ABOUT_PARAM_NAME);
 
-        if (genres.length < 3 || genres.length > 5) {
-            writer.println("<h1>" + "Необходимо выбрать от 3 до 5 жанров" + "</h1>");
-            writer.close();
-        } else {
-            listGenres.addAll(Arrays.asList(genres));
-        }
-
-        listPerformer.add(performer);
-
-        if (!Objects.equals(comment, "")) {
-            commentsList.add(comment + " (" + date + ")");
-        }
+        iVoteService.save(performer, genres, comment);
 
         writer.write("<p><i>Результаты голосования:</i></p>");
         writer.write("<p><b>Лучший исполнитель:</b><p>");
 
-        Map<String, Integer> listMapPerformer = listPerformer.stream().collect(toMap(e -> e, e -> 1, Integer::sum));
-
-        List<Map.Entry<String, Integer>> collect = listMapPerformer.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .toList();
-
-        Map<String, Integer> listMapGenres = listGenres.stream().collect(toMap(e -> e, e -> 1, Integer::sum));
-
-        List<Map.Entry<String, Integer>> collect2 = listMapGenres.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .toList();
-
-        for (Map.Entry<String, Integer> pair : collect) {
+        for (Map.Entry<String, Integer> pair : iVoteService.mapCollectPerfomer()) {
             String key = pair.getKey();
             Integer value = pair.getValue();
 
@@ -81,7 +52,8 @@ public class Vote extends HttpServlet {
         }
 
         writer.write("<p><b>Ваши любимые жанры:</b></p>");
-        for (Map.Entry<String, Integer> pair : collect2) {
+
+        for (Map.Entry<String, Integer> pair : iVoteService.mapCollectGenres()) {
             String key = pair.getKey();
             Integer value = pair.getValue();
 
@@ -100,8 +72,8 @@ public class Vote extends HttpServlet {
         }
 
         writer.write("<p><b>Комментарии:</b><p>");
-        for (int i = 0; i < commentsList.size(); i++) {
-            writer.write("<p>" + commentsList.get(i) + "</p>");
+        for (String s : iVoteService.commentsList()) {
+            writer.write("<p>" + s + " (" + formatter.format(new Date()) + ")" + "</p>");
         }
     }
 }
