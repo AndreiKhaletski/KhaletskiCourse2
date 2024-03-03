@@ -39,37 +39,10 @@ public class Vote extends HttpServlet {
         writer.write("<p><i>Результаты голосования:</i></p>");
         writer.write("<p><b>Лучший исполнитель:</b><p>");
 
-        for (Map.Entry<String, Integer> pair : iVoteService.mapCollectPerfomer()) {
-            String key = pair.getKey();
-            Integer value = pair.getValue();
-
-            switch (key) {
-                case "a1" -> writer.write("<p>Linkin Park = " + value + " гол.</p>");
-                case "a2" -> writer.write("<p>Revolver = " + value + " гол.</p>");
-                case "a3" -> writer.write("<p>Mangolia Park = " + value + " гол.</p>");
-                case "a4" -> writer.write("<p>Colin = " + value + " гол.</p>");
-            }
-        }
+        iVoteService.printPerformerResults(writer);
 
         writer.write("<p><b>Ваши любимые жанры:</b></p>");
-
-        for (Map.Entry<String, Integer> pair : iVoteService.mapCollectGenres()) {
-            String key = pair.getKey();
-            Integer value = pair.getValue();
-
-            switch (key) {
-                case "g1" -> writer.write("<p>Hip-Hop = " + value + " гол.</p>");
-                case "g2" -> writer.write("<p>Rock = " + value + " гол.</p>");
-                case "g3" -> writer.write("<p>Pop = " + value + " гол.</p>");
-                case "g4" -> writer.write("<p>Disco = " + value + " гол.</p>");
-                case "g5" -> writer.write("<p>Fusion = " + value + " гол.</p>");
-                case "g6" -> writer.write("<p>Classical = " + value + " гол.</p>");
-                case "g7" -> writer.write("<p>Electronic = " + value + " гол.</p>");
-                case "g8" -> writer.write("<p>Jazz = " + value + " гол.</p>");
-                case "g9" -> writer.write("<p>Country = " + value + " гол.</p>");
-                case "g10" -> writer.write("<p>Reggae = " + value + " гол.</p>");
-            }
-        }
+        iVoteService.printGenreResults(writer);
 
         writer.write("<p><b>Комментарии:</b><p>");
         for (String s : iVoteService.commentsList()) {
