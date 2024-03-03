@@ -7,11 +7,9 @@ import java.util.Map;
 public interface IVoteService {
     void save(String performer, String[] genres, String comment);
 
-    void printPerformerResults(PrintWriter writer);
-    void printGenreResults(PrintWriter writer);
-    void printCommentResults(PrintWriter writer);
+    String calculatePerformerResults();
 
-    List<Map.Entry<String, Integer>> mapCollectGenres();
+    String calculateGenreResults();
 
     List<String> commentsList();
 }

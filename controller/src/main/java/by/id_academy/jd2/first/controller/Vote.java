@@ -39,10 +39,10 @@ public class Vote extends HttpServlet {
         writer.write("<p><i>Результаты голосования:</i></p>");
         writer.write("<p><b>Лучший исполнитель:</b><p>");
 
-        iVoteService.printPerformerResults(writer);
+        writer.write(iVoteService.calculatePerformerResults());
 
         writer.write("<p><b>Ваши любимые жанры:</b></p>");
-        iVoteService.printGenreResults(writer);
+        writer.write(iVoteService.calculateGenreResults());
 
         writer.write("<p><b>Комментарии:</b><p>");
         for (String s : iVoteService.commentsList()) {

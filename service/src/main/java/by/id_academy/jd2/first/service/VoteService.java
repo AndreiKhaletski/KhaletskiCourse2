@@ -5,10 +5,12 @@ import by.id_academy.jd2.first.dao.api.IVoteDao;
 import by.id_academy.jd2.first.service.api.IVoteService;
 
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class VoteService implements IVoteService {
     private final IVoteDao voteDao = new VoteDAO();
+
     @Override
     public void save(String performer, String[] genres, String comment) {
 
@@ -20,68 +22,61 @@ public class VoteService implements IVoteService {
     }
 
     @Override
-    public List<String> commentsList() {
-        return voteDao.commentsList();
-    }
-
-    @Override
-    public void printPerformerResults(PrintWriter writer) {
+    public String calculatePerformerResults() {
         Map<String, Integer> sortedOne = voteDao.mapPerformer();
         List<Map.Entry<String, Integer>> sortedResultList = sortedOne.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .toList();
+
+        StringBuilder stringBuilder = new StringBuilder();
 
         for (Map.Entry<String, Integer> pair : sortedResultList) {
             String key = pair.getKey();
             Integer value = pair.getValue();
 
             switch (key) {
-                case "a1" -> writer.write("<p>Linkin Park = " + value + " гол.</p>");
-                case "a2" -> writer.write("<p>Revolver = " + value + " гол.</p>");
-                case "a3" -> writer.write("<p>Mangolia Park = " + value + " гол.</p>");
-                case "a4" -> writer.write("<p>Colin = " + value + " гол.</p>");
+                case "a1" -> stringBuilder.append("<p>Linkin Park = " + value + " гол.</p>").append("\n");
+                case "a2" -> stringBuilder.append("<p>Revolver = " + value + " гол.</p>").append("\n");
+                case "a3" -> stringBuilder.append("<p>Mangolia Park = " + value + " гол.</p>").append("\n");
+                case "a4" -> stringBuilder.append("<p>Colin = " + value + " гол.</p>").append("\n");
+                default -> stringBuilder.append("Такой id группы не существуюет: " + key).append("\n");
             }
         }
+
+        return stringBuilder.toString();
     }
 
     @Override
-    public void printGenreResults(PrintWriter writer) {
+    public String calculateGenreResults() {
         Map<String, Integer> sortedTwo = voteDao.mapGenres();
         List<Map.Entry<String, Integer>> list = sortedTwo.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .toList();
+
+        StringBuilder stringBuilder = new StringBuilder();
 
         for (Map.Entry<String, Integer> pair : list) {
             String key = pair.getKey();
             Integer value = pair.getValue();
 
             switch (key) {
-                case "g1" -> writer.write("<p>Hip-Hop = " + value + " гол.</p>");
-                case "g2" -> writer.write("<p>Rock = " + value + " гол.</p>");
-                case "g3" -> writer.write("<p>Pop = " + value + " гол.</p>");
-                case "g4" -> writer.write("<p>Disco = " + value + " гол.</p>");
-                case "g5" -> writer.write("<p>Fusion = " + value + " гол.</p>");
-                case "g6" -> writer.write("<p>Classical = " + value + " гол.</p>");
-                case "g7" -> writer.write("<p>Electronic = " + value + " гол.</p>");
-                case "g8" -> writer.write("<p>Jazz = " + value + " гол.</p>");
-                case "g9" -> writer.write("<p>Country = " + value + " гол.</p>");
-                case "g10" -> writer.write("<p>Reggae = " + value + " гол.</p>");
+                case "g1" -> stringBuilder.append("<p>Hip-Hop = " + value + " гол.</p>").append("\n");
+                case "g2" -> stringBuilder.append("<p>Rock = " + value + " гол.</p>").append("\n");
+                case "g3" -> stringBuilder.append("<p>Pop = " + value + " гол.</p>").append("\n");
+                case "g4" -> stringBuilder.append("<p>Disco = " + value + " гол.</p>").append("\n");
+                case "g5" -> stringBuilder.append("<p>Fusion = " + value + " гол.</p>").append("\n");
+                case "g6" -> stringBuilder.append("<p>Classical = " + value + " гол.</p>").append("\n");
+                case "g7" -> stringBuilder.append("<p>Electronic = " + value + " гол.</p>").append("\n");
+                case "g8" -> stringBuilder.append("<p>Jazz = " + value + " гол.</p>").append("\n");
+                case "g9" -> stringBuilder.append("<p>Country = " + value + " гол.</p>").append("\n");
+                case "g10" -> stringBuilder.append("<p>Reggae = " + value + " гол.</p>").append("\n");
             }
         }
+        return stringBuilder.toString();
     }
 
     @Override
-    public void printCommentResults(PrintWriter writer) {
-
+    public List<String> commentsList() {
+        return voteDao.commentsList();
     }
-
-    @Override
-    public List<Map.Entry<String, Integer>> mapCollectGenres() {
-        Map<String, Integer> sortedTwo = voteDao.mapGenres();
-        return sortedTwo.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .toList();
-    }
-
-
 }
